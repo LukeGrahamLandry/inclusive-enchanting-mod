@@ -1,5 +1,6 @@
 package io.github.lukegrahamlandry.inclusiveenchanting;
 
+import io.github.lukegrahamlandry.inclusiveenchanting.events.AnvilEnchantHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
@@ -15,5 +16,7 @@ public class InclusiveEnchanting{
     public InclusiveEnchanting() {
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+
+        AnvilEnchantHandler.initNewValidEnchants();
     }
 }
