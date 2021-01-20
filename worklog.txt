@@ -1,9 +1,10 @@
-<January 20> $23.35
+<January 20> $26.65
 30: planning and reading vanilla enchanting code
 10: project setup
 30: allow anvil to apply new enchants
+10: flame on crossbows
 
 
-TOTAL: $23.35
+TOTAL: $26.65
 PAID: $40
 OWED: $0
