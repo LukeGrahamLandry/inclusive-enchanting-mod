@@ -4,7 +4,11 @@
 30: allow anvil to apply new enchants
 10: flame on crossbows
 
+<January 22> $13.35
+20: incompatible enchants
+10: punch on crossbows
+10: piercing on bows
 
-TOTAL: $26.65
-PAID: $40
-OWED: $0
+TOTAL: $40
+PAID : $40
+OWED : $0

@@ -1,16 +1,17 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.events;
 
+import com.google.common.collect.Sets;
 import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -21,9 +22,14 @@ import java.util.function.Function;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AnvilEnchantHandler {
     private static HashMap<Enchantment, Function<ItemStack, Boolean>> validEnchants = new HashMap<>();
+    private static List<Set<Enchantment>> incompatibleEnchants = new ArrayList<>();
 
     public static void initNewValidEnchants(){
         validEnchants.put(Enchantments.FLAME, (item) -> item.getItem().isCrossbow(item));
+        validEnchants.put(Enchantments.PUNCH, (item) -> item.getItem().isCrossbow(item));
+        validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem);
+
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAME, Enchantments.MULTISHOT, Enchantments.PIERCING));
     }
 
     @SubscribeEvent
@@ -42,63 +48,62 @@ public class AnvilEnchantHandler {
                 // check if it can be applied on this tool
                 boolean oldValid = enchant.canApply(tool);
                 boolean newValid = validEnchants.containsKey(enchant) && validEnchants.get(enchant).apply(tool);
-                InclusiveEnchanting.LOGGER.debug(oldValid);
-                InclusiveEnchanting.LOGGER.debug(newValid);
                 if (!oldValid && !newValid) return;
 
                 // check compatibility. ie no infinity and mending
                 AtomicBoolean compatable = new AtomicBoolean(true);
                 AtomicBoolean alreadyHas = new AtomicBoolean(false);
                 toolEnchants.forEach(((enchantToTest, lvl) -> {
+                    // check vanilla compatibility
                     if (!enchantToTest.isCompatibleWith(enchant)){
                         compatable.set(false);
                     }
+
+                    // check new compatibility
+                    incompatibleEnchants.forEach((enchantGroup) -> {
+                        if (enchantGroup.contains(enchant) && enchantGroup.contains(enchantToTest)){
+                            compatable.set(false);
+                        }
+                    });
 
                     if (enchantToTest == enchant){
                         alreadyHas.set(true);
                     }
                 }));
-                if (!compatable.get()) return;
 
+                if (compatable.get()){
+                    // if it already has that enchantment
+                    if (alreadyHas.get()){
 
-                // if it already has that enchantment
-                if (alreadyHas.get()){
+                        // if the levels are the same and can be added together
+                        if (level.equals(toolEnchants.get(enchant))){
+                            if (level + 1 <= enchant.getMaxLevel()){
+                                newEnchantments.put(enchant, level + 1);
+                                totalCost.addAndGet(getXPCost(enchant));
+                            }
 
-                    // if the levels are the same and can be added together
-                    if (level.equals(toolEnchants.get(enchant))){
-                        if (level + 1 <= enchant.getMaxLevel()){
-                            newEnchantments.put(enchant, level + 1);
+                        // if the new one is larger than the old
+                        } else if (level > toolEnchants.get(enchant)){
+                            newEnchantments.put(enchant, level);
                             totalCost.addAndGet(getXPCost(enchant));
-                            return;
                         }
-                    }
 
-                    // if the new one is larger than the old
-                    if (level > toolEnchants.get(enchant)){
+                    // if is new enchantment
+                    } else {
                         newEnchantments.put(enchant, level);
                         totalCost.addAndGet(getXPCost(enchant));
-                        return;
                     }
                 }
-
-                newEnchantments.put(enchant, level);
-                totalCost.addAndGet(getXPCost(enchant));
             });
 
+            newEnchantments.forEach(toolEnchants::put);
+            ItemStack out = tool.copy();
+            EnchantmentHelper.setEnchantments(toolEnchants, out);
+            event.setOutput(out);
+            event.setCost(totalCost.get());
+            event.setMaterialCost(1);
 
-            if (!newEnchantments.isEmpty()){
-                newEnchantments.forEach(toolEnchants::put);
-
-                InclusiveEnchanting.LOGGER.debug("tool: " + EnchantmentHelper.getEnchantments(tool).toString());
-                InclusiveEnchanting.LOGGER.debug("add: " + EnchantmentHelper.getEnchantments(add).toString());
-                InclusiveEnchanting.LOGGER.debug("new: " + toolEnchants.toString());
-
-                ItemStack out = tool.copy();
-                EnchantmentHelper.setEnchantments(toolEnchants, out);
-                event.setOutput(out);
-                event.setCost(totalCost.get());
-                event.setMaterialCost(1);
-            }
+            // TODO: repairing items wont work. reimpliemnt that logic here
         }
     }
 
