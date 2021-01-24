@@ -7,6 +7,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolItem;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -28,8 +29,10 @@ public class AnvilEnchantHandler {
         validEnchants.put(Enchantments.FLAME, (item) -> item.getItem().isCrossbow(item));
         validEnchants.put(Enchantments.PUNCH, (item) -> item.getItem().isCrossbow(item));
         validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem);
+        validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof ToolItem);
 
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAME, Enchantments.MULTISHOT, Enchantments.PIERCING));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.FORTUNE));
     }
 
     @SubscribeEvent

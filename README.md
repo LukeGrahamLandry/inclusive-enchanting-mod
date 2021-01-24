@@ -7,8 +7,10 @@ Commissioned by Dynam0, see [worklog](worklog.txt) for payment information.
 - **Anvil can apply some enchants to extra items**
 - Crossbow: flame and punch
 - Bow: piercing 
+- Tools: fire aspect (acts as auto smelt)
 - **Incompatible**
     - flame / piercing / multishot
+    - fire aspect / fortune / silk touch
 
 ## Known Bugs
 - repairing items in the anvil is broken

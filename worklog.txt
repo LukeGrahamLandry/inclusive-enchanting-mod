@@ -9,6 +9,9 @@
 10: punch on crossbows
 10: piercing on bows
 
-TOTAL: $40
+<January 24> $15
+45: fire aspect on tools
+
+TOTAL: $55
 PAID : $40
-OWED : $0
+OWED : $15
