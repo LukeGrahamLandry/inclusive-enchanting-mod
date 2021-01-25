@@ -12,9 +12,10 @@
 <January 24> $15
 45: fire aspect on tools
 
-<January 25> $10
+<January 25> $20
 30: quick charge on bows
+30: fix repairing and renaming in anvil
 
-TOTAL: $65
+TOTAL: $75
 PAID : $40
-OWED : $25
+OWED : $35
