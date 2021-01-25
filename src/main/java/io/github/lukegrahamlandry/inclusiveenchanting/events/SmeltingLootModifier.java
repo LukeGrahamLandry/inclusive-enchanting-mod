@@ -21,17 +21,13 @@ import java.util.List;
 public class SmeltingLootModifier extends LootModifier {
     public SmeltingLootModifier(ILootCondition[] conditionsIn) {
         super(conditionsIn);
-        InclusiveEnchanting.LOGGER.debug("smelting init");
     }
 
     @Nonnull
     @Override
     public List<ItemStack> doApply(List<ItemStack> originalLoot, LootContext context) {
-        InclusiveEnchanting.LOGGER.debug("doApply smelting");
-
         List<ItemStack> newLoot = new ArrayList<>();
         for(ItemStack stack : originalLoot) {
-            InclusiveEnchanting.LOGGER.debug(stack + " -> " + smelt(stack, context.getWorld()));
             newLoot.add(smelt(stack, context.getWorld()));
         }
 

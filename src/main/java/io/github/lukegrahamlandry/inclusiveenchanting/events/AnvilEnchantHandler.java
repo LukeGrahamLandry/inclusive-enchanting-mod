@@ -30,9 +30,11 @@ public class AnvilEnchantHandler {
         validEnchants.put(Enchantments.PUNCH, (item) -> item.getItem().isCrossbow(item));
         validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem);
         validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof ToolItem);
+        validEnchants.put(Enchantments.QUICK_CHARGE, (item) -> item.getItem() instanceof BowItem);
 
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAME, Enchantments.MULTISHOT, Enchantments.PIERCING));
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.FORTUNE));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.QUICK_CHARGE, Enchantments.POWER));
     }
 
     @SubscribeEvent

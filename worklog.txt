@@ -12,6 +12,9 @@
 <January 24> $15
 45: fire aspect on tools
 
-TOTAL: $55
+<January 25> $10
+30: quick charge on bows
+
+TOTAL: $65
 PAID : $40
-OWED : $15
+OWED : $25
