@@ -1,14 +1,15 @@
 package io.github.lukegrahamlandry.inclusiveenchanting;
 
 import io.github.lukegrahamlandry.inclusiveenchanting.events.AnvilEnchantHandler;
-import io.github.lukegrahamlandry.inclusiveenchanting.events.SmeltingLootModifier;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
-import net.minecraftforge.event.RegistryEvent;
+import io.github.lukegrahamlandry.inclusiveenchanting.init.DataProvider;
+import io.github.lukegrahamlandry.inclusiveenchanting.init.EntityInit;
+import net.minecraft.client.renderer.entity.TridentRenderer;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +26,7 @@ public class InclusiveEnchanting{
         AnvilEnchantHandler.initNewValidEnchants();
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         DataProvider.LOOT_MODIFIERS.register(eventBus);
+        EntityInit.ENTITY_TYPES.register(eventBus);
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -32,6 +34,14 @@ public class InclusiveEnchanting{
         @SubscribeEvent
         public static void runData(GatherDataEvent event){
             event.getGenerator().addProvider(new DataProvider(event.getGenerator(), MOD_ID));
+        }
+    }
+
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public static class RegisterClientThings{
+        @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event) {
+            RenderingRegistry.registerEntityRenderingHandler(EntityInit.CUSTOM_TRIDENT.get(), TridentRenderer::new);
         }
     }
 }

@@ -5,6 +5,7 @@ import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.inventory.container.RepairContainer;
 import net.minecraft.item.*;
 import net.minecraft.util.text.StringTextComponent;
@@ -33,6 +34,7 @@ public class AnvilEnchantHandler {
         validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof ToolItem);
         validEnchants.put(Enchantments.QUICK_CHARGE, (item) -> item.getItem() instanceof BowItem);
         validEnchants.put(Enchantments.KNOCKBACK, (item) -> item.getItem() instanceof ShieldItem);
+        validEnchants.put(Enchantments.POWER, (item) -> item.getItem() instanceof TridentItem);
 
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAME, Enchantments.MULTISHOT, Enchantments.PIERCING));
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.FORTUNE));

@@ -1,5 +1,6 @@
-package io.github.lukegrahamlandry.inclusiveenchanting;
+package io.github.lukegrahamlandry.inclusiveenchanting.init;
 
+import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
 import io.github.lukegrahamlandry.inclusiveenchanting.events.SmeltingLootModifier;
 import net.minecraft.advancements.criterion.EnchantmentPredicate;
 import net.minecraft.advancements.criterion.ItemPredicate;
