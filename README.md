@@ -8,6 +8,7 @@ Commissioned by Dynam0, see [worklog](worklog.txt) for payment information.
 - Crossbow: flame and punch
 - Bow: piercing, quick charge
 - Tools: fire aspect (acts as auto smelt)
+- Shield: knock back
 - **Incompatible**
     - flame / piercing / multishot
     - fire aspect / fortune / silk touch

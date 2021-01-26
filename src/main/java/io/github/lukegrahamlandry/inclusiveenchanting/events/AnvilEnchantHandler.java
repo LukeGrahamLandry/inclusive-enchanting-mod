@@ -32,6 +32,7 @@ public class AnvilEnchantHandler {
         validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem);
         validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof ToolItem);
         validEnchants.put(Enchantments.QUICK_CHARGE, (item) -> item.getItem() instanceof BowItem);
+        validEnchants.put(Enchantments.KNOCKBACK, (item) -> item.getItem() instanceof ShieldItem);
 
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAME, Enchantments.MULTISHOT, Enchantments.PIERCING));
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.FORTUNE));
@@ -62,6 +63,8 @@ public class AnvilEnchantHandler {
         boolean isBook = add.getItem() == Items.ENCHANTED_BOOK && !EnchantedBookItem.getEnchantments(add).isEmpty();
 
         if (tool.getItem().isEnchantable(tool) && !addEnchants.isEmpty()){
+            AtomicBoolean compatable = new AtomicBoolean(true);
+
             addEnchants.forEach((enchant, level) -> {
                 // check if it can be applied on this tool
                 boolean oldValid = enchant.canApply(tool);
@@ -69,7 +72,7 @@ public class AnvilEnchantHandler {
                 if (!oldValid && !newValid) return;
 
                 // check compatibility. ie no infinity and mending
-                AtomicBoolean compatable = new AtomicBoolean(true);
+
                 AtomicBoolean alreadyHas = new AtomicBoolean(false);
                 toolEnchants.forEach(((enchantToTest, lvl) -> {
                     // check vanilla compatibility
@@ -79,7 +82,7 @@ public class AnvilEnchantHandler {
 
                     // check new compatibility
                     incompatibleEnchants.forEach((enchantGroup) -> {
-                        if (enchantGroup.contains(enchant) && enchantGroup.contains(enchantToTest)){
+                        if (!enchant.equals(enchantToTest) && enchantGroup.contains(enchant) && enchantGroup.contains(enchantToTest)){
                             compatable.set(false);
                         }
                     });
@@ -114,12 +117,17 @@ public class AnvilEnchantHandler {
                 }
             });
 
-            newEnchantments.forEach(toolEnchants::put);
-            ItemStack out = tool.copy();
-            EnchantmentHelper.setEnchantments(toolEnchants, out);
-            event.setOutput(out);
-            event.setCost(totalCost.get());
-            event.setMaterialCost(1);
+            if (compatable.get()){
+                newEnchantments.forEach(toolEnchants::put);
+                ItemStack out = tool.copy();
+                EnchantmentHelper.setEnchantments(toolEnchants, out);
+                event.setOutput(out);
+                event.setCost(totalCost.get());
+                event.setMaterialCost(1);
+            } else {
+                event.setCanceled(true);
+            }
+
         }
     }
 
