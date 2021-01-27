@@ -22,6 +22,7 @@ public class TridentHandler {
         Entity shooter = oldTrident.func_234616_v_();  // change this to getShooter when mappings update
         if (!(shooter instanceof LivingEntity)) return;
 
+        // this isn't actually an error. intellij just doesnt know about access transformers
         CustomTridentEntity newTrident = new CustomTridentEntity(oldTrident.getEntityWorld(), (LivingEntity) shooter, oldTrident.getArrowStack());
         newTrident.setPosition(oldTrident.getPosX(), oldTrident.getPosY(), oldTrident.getPosZ());
         newTrident.setMotion(oldTrident.getMotion());

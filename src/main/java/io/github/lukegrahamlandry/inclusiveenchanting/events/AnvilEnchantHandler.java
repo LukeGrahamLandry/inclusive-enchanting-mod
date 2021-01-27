@@ -30,7 +30,7 @@ public class AnvilEnchantHandler {
     public static void initNewValidEnchants(){
         validEnchants.put(Enchantments.FLAME, (item) -> item.getItem().isCrossbow(item));
         validEnchants.put(Enchantments.PUNCH, (item) -> item.getItem().isCrossbow(item));
-        validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem);
+        validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem || item.getItem() instanceof TridentItem);
         validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof ToolItem);
         validEnchants.put(Enchantments.QUICK_CHARGE, (item) -> item.getItem() instanceof BowItem);
         validEnchants.put(Enchantments.KNOCKBACK, (item) -> item.getItem() instanceof ShieldItem);
@@ -38,7 +38,8 @@ public class AnvilEnchantHandler {
 
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAME, Enchantments.MULTISHOT, Enchantments.PIERCING));
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.FORTUNE));
-        incompatibleEnchants.add(Sets.newHashSet(Enchantments.QUICK_CHARGE, Enchantments.POWER));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.QUICK_CHARGE, Enchantments.POWER, Enchantments.IMPALING));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.CHANNELING, Enchantments.RIPTIDE, Enchantments.PIERCING));
     }
 
     @SubscribeEvent

@@ -16,10 +16,11 @@
 30: quick charge on bows
 30: fix repairing and renaming in anvil
 
-<January 26> $15
+<January 26> $25
 15: knockback shield and fix incompatible enchants
 30: custom trident entity (for piercing)
+30: trident piercing and power
 
-TOTAL: $90
+TOTAL: $100
 PAID : $80
-OWED : $10
+OWED : $20
