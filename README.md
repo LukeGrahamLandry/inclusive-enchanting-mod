@@ -9,10 +9,8 @@ Commissioned by Dynam0, see [worklog](worklog.txt) for payment information.
 - Bow: piercing, quick charge
 - Tools: fire aspect (acts as auto smelt)
 - Shield: knock back
+- Trident: piercing, power, quick charge
 - **Incompatible**
     - flame / piercing / multishot
     - fire aspect / fortune / silk touch
-    - quick charge / power
-
-## Known Bugs
-- repairing items in the anvil is broken
+    - quick charge / power / impaling 

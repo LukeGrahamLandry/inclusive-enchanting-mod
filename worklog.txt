@@ -21,6 +21,11 @@
 30: custom trident entity (for piercing)
 30: trident piercing and power
 
-TOTAL: $100
+<January 28> $35
+15: trident quick charge
+45: quick draw trident animating properly
+45: fixing rendering trident inventory vs hand
+
+TOTAL: $135
 PAID : $80
-OWED : $20
+OWED : $55
