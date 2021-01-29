@@ -26,6 +26,10 @@
 45: quick draw trident animating properly
 45: fixing rendering trident inventory vs hand
 
-TOTAL: $135
+<January 29> $25
+60: new enchants in table
+15: debug screen force closing
+
+TOTAL: $160
 PAID : $80
-OWED : $55
+OWED : $80

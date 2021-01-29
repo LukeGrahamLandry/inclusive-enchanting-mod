@@ -53,6 +53,20 @@ public class AnvilEnchantHandler {
         return !event.getRight().isEmpty() && event.getRight().isDamageable() && event.getLeft().getItem() != event.getRight().getItem();
     }
 
+    public static boolean isNewValid(Enchantment enchant, ItemStack stack){
+        return validEnchants.containsKey(enchant) && validEnchants.get(enchant).apply(stack);
+    }
+
+    public static boolean areNewIncompateble(Enchantment enchant, Enchantment enchant2){
+        for (Set<Enchantment> enchantGroup : incompatibleEnchants){
+            if (!enchant.equals(enchant2) && enchantGroup.contains(enchant) && enchantGroup.contains(enchant2)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static void doNewEnchants(AnvilUpdateEvent event){
         ItemStack tool = event.getLeft();
         ItemStack add = event.getRight();
@@ -71,7 +85,7 @@ public class AnvilEnchantHandler {
             addEnchants.forEach((enchant, level) -> {
                 // check if it can be applied on this tool
                 boolean oldValid = enchant.canApply(tool);
-                boolean newValid = validEnchants.containsKey(enchant) && validEnchants.get(enchant).apply(tool);
+                boolean newValid = isNewValid(enchant, tool); // validEnchants.containsKey(enchant) && validEnchants.get(enchant).apply(tool);
                 if (!oldValid && !newValid) return;
 
                 // check compatibility. ie no infinity and mending
@@ -84,11 +98,9 @@ public class AnvilEnchantHandler {
                     }
 
                     // check new compatibility
-                    incompatibleEnchants.forEach((enchantGroup) -> {
-                        if (!enchant.equals(enchantToTest) && enchantGroup.contains(enchant) && enchantGroup.contains(enchantToTest)){
-                            compatable.set(false);
-                        }
-                    });
+                    if (areNewIncompateble(enchant, enchantToTest)){
+                        compatable.set(false);
+                    }
 
                     if (enchantToTest == enchant){
                         alreadyHas.set(true);

@@ -2,11 +2,12 @@ package io.github.lukegrahamlandry.inclusiveenchanting;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.lukegrahamlandry.inclusiveenchanting.events.AnvilEnchantHandler;
-import io.github.lukegrahamlandry.inclusiveenchanting.init.DataProvider;
-import io.github.lukegrahamlandry.inclusiveenchanting.init.EntityInit;
-import io.github.lukegrahamlandry.inclusiveenchanting.init.ItemInit;
+import io.github.lukegrahamlandry.inclusiveenchanting.init.*;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screen.EnchantmentScreen;
 import net.minecraft.client.renderer.entity.TridentRenderer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
@@ -22,8 +23,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -47,6 +50,9 @@ public class InclusiveEnchanting{
         DataProvider.LOOT_MODIFIERS.register(eventBus);
         EntityInit.ENTITY_TYPES.register(eventBus);
         ItemInit.ITEMS.register(eventBus);
+        BlockInit.BLOCKS.register(eventBus);
+        TileEntityInit.TILE_ENTITY_TYPES.register(eventBus);
+        ContainerInit.CONTAINER_TYPES.register(eventBus);
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -60,6 +66,14 @@ public class InclusiveEnchanting{
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class ForgeEvent{
         static Random rand = new Random();
+
+        @SubscribeEvent
+        public static void replaceEnchantTable(BlockEvent.EntityPlaceEvent event){
+            if (!event.getEntity().getEntityWorld().isRemote() && event.getPlacedBlock().getBlock() == Blocks.ENCHANTING_TABLE){
+                event.getBlockSnapshot().getWorld().setBlockState(event.getBlockSnapshot().getPos(), BlockInit.CUSTOM_ENCHANT_TABLE.get().getDefaultState(), 2);
+                // event.setCanceled(true);
+            }
+        }
 
         @SubscribeEvent
         public static void replaceTrident(TickEvent.PlayerTickEvent event){
@@ -121,6 +135,9 @@ public class InclusiveEnchanting{
             // this renders properly in hand but too long in inventory
             // Minecraft.getInstance().getItemRenderer().getItemModelMesher().register(ItemInit.CUSTOM_TRIDENT.get(), new ModelResourceLocation("minecraft:trident_in_hand#inventory"));
             Minecraft.getInstance().getItemRenderer().getItemModelMesher().register(ItemInit.CUSTOM_TRIDENT.get(), new ModelResourceLocation("minecraft:trident_in_hand#inventory"));
+
+            ClientRegistry.bindTileEntityRenderer(TileEntityInit.ENCHANTING_TABLE.get(), CustomEnchantTableRenderer::new);
+            ScreenManager.registerFactory(ContainerInit.ENCHANT_TABLE.get(), EnchantmentScreen::new);
         }
     }
 }
