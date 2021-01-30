@@ -31,5 +31,5 @@
 15: debug screen force closing
 
 TOTAL: $160
-PAID : $80
-OWED : $80
+PAID : $160
+OWED : $0
