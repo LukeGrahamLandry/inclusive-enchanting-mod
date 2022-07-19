@@ -5,14 +5,14 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ProjectileHandler {
     @SubscribeEvent
-    public static void flameCrossbow(EntityJoinWorldEvent event){
+    public static void flameCrossbow(EntityJoinLevelEvent event){
         Entity entity = event.getEntity();
         if (entity.getCommandSenderWorld().isClientSide()) return;
         if (!(entity instanceof AbstractArrow)) return;

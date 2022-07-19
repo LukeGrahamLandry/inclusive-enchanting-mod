@@ -1,11 +1,14 @@
 package io.github.lukegrahamlandry.inclusiveenchanting;
 
-import net.minecraft.block.*;
-import net.minecraft.inventory.container.EnchantmentContainer;
+import io.github.lukegrahamlandry.inclusiveenchanting.init.TileEntityInit;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.EnchantingTableTileEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.inventory.ContainerLevelAccess;
@@ -18,6 +21,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EnchantmentTableBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+
+import javax.annotation.Nullable;
 
 public class CustomEnchantTableBlock extends EnchantmentTableBlock {
     public CustomEnchantTableBlock() {
@@ -34,8 +39,14 @@ public class CustomEnchantTableBlock extends EnchantmentTableBlock {
         }, itextcomponent);
     }
 
-    public BlockEntity newBlockEntity(BlockGetter worldIn) {
-        return new CustomEnchantTableTile();
+    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+        return new CustomEnchantTableTile(pPos, pState);
     }
+
+   @Nullable
+   @Override
+   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
+      return pLevel.isClientSide ? createTickerHelper(pBlockEntityType, TileEntityInit.ENCHANTING_TABLE.get(), CustomEnchantTableTile::bookAnimationTick) : null;
+   }
 
 }

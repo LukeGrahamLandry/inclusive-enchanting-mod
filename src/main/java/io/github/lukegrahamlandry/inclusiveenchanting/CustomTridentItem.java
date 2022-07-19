@@ -3,6 +3,7 @@ package io.github.lukegrahamlandry.inclusiveenchanting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -18,7 +19,7 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownTrident;
-import net.minecraft.item.*;
+import net.minecraft.world.item.*;
 import net.minecraft.stats.Stats;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
@@ -33,11 +34,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TridentItem;
 
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+
+import java.util.function.Consumer;
+
 public class CustomTridentItem extends TridentItem {
     public CustomTridentItem(Item.Properties properties) {
-        super(properties.setISTER(() -> ISTER::new));
+        super(properties);
 
-        ItemProperties.register(this, new ResourceLocation("throwing"), (p_239419_0_, p_239419_1_, p_239419_2_) -> {
+        ItemProperties.register(this, new ResourceLocation("throwing"), (p_239419_0_, p_239419_1_, p_239419_2_, seed) -> {
             return p_239419_2_ != null && p_239419_2_.isUsingItem() && p_239419_2_.getUseItem() == p_239419_0_ ? 1.0F : 0.0F;
         });
     }
@@ -55,23 +60,23 @@ public class CustomTridentItem extends TridentItem {
                         });
                         if (j == 0) {
                             ThrownTrident tridententity = new CustomTridentEntity(worldIn, playerentity, stack);
-                            tridententity.shootFromRotation(playerentity, playerentity.xRot, playerentity.yRot, 0.0F, 2.5F + (float)j * 0.5F, 1.0F);
-                            if (playerentity.abilities.instabuild) {
+                            tridententity.shootFromRotation(playerentity, playerentity.getXRot(), playerentity.getYRot(), 0.0F, 2.5F + (float)j * 0.5F, 1.0F);
+                            if (playerentity.getAbilities().instabuild) {
                                 tridententity.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             }
 
                             worldIn.addFreshEntity(tridententity);
                             worldIn.playSound((Player)null, tridententity, SoundEvents.TRIDENT_THROW, SoundSource.PLAYERS, 1.0F, 1.0F);
-                            if (!playerentity.abilities.instabuild) {
-                                playerentity.inventory.removeItem(stack);
+                            if (!playerentity.getAbilities().instabuild) {
+                                playerentity.getInventory().removeItem(stack);
                             }
                         }
                     }
 
                     playerentity.awardStat(Stats.ITEM_USED.get(this));
                     if (j > 0) {
-                        float f7 = playerentity.yRot;
-                        float f = playerentity.xRot;
+                        float f7 = playerentity.getYRot();
+                        float f = playerentity.getXRot();
                         float f1 = -Mth.sin(f7 * ((float)Math.PI / 180F)) * Mth.cos(f * ((float)Math.PI / 180F));
                         float f2 = -Mth.sin(f * ((float)Math.PI / 180F));
                         float f3 = Mth.cos(f7 * ((float)Math.PI / 180F)) * Mth.cos(f * ((float)Math.PI / 180F));
@@ -105,18 +110,32 @@ public class CustomTridentItem extends TridentItem {
     }
 
     public static int getDrawTime(ItemStack stack) {
-        return 10 - (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.QUICK_CHARGE, stack) * 2);
+        return 10 - (EnchantmentHelper.getTagEnchantmentLevel(Enchantments.QUICK_CHARGE, stack) * 2);
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return new ISTER();
+            }
+        });
     }
 
     static class ISTER extends BlockEntityWithoutLevelRenderer {
-        TridentModel trident = new TridentModel();
+        TridentModel trident;
+        ISTER() {
+            super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+            trident = new TridentModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.TRIDENT));
+        }
         public void renderByItem(ItemStack stack, ItemTransforms.TransformType transformTypeIn, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
             boolean flag = transformTypeIn == ItemTransforms.TransformType.GUI || transformTypeIn == ItemTransforms.TransformType.GROUND || transformTypeIn == ItemTransforms.TransformType.FIXED;
             if (flag){
                 BakedModel modelIn = Minecraft.getInstance().getItemRenderer().getItemModelShaper().getModelManager().getModel(new ModelResourceLocation("minecraft:trident#inventory"));
                 modelIn = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(matrixStack, modelIn, transformTypeIn, false);
                 matrixStack.translate(-0.60D, -0.75D, -0.75D);
-                if (modelIn.isLayered()) { net.minecraftforge.client.ForgeHooksClient.drawItemLayered(Minecraft.getInstance().getItemRenderer(), modelIn, stack, matrixStack, buffer, combinedLight, combinedOverlay, true); }
+                if (modelIn.isCustomRenderer()) { IClientItemExtensions.of(stack).getCustomRenderer().renderByItem(stack, transformTypeIn, matrixStack, buffer, combinedLight, combinedOverlay); }
                 else {
                     matrixStack.scale(1.6f,1.6f,1.6f);
                     VertexConsumer ivertexbuilder = ItemRenderer.getFoilBufferDirect(buffer,  ItemBlockRenderTypes.getRenderType(stack, true), true, stack.hasFoil());

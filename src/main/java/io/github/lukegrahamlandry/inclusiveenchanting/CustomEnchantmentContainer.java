@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import io.github.lukegrahamlandry.inclusiveenchanting.events.AnvilEnchantHandler;
 import io.github.lukegrahamlandry.inclusiveenchanting.init.BlockInit;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
-import net.minecraft.inventory.container.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.Item;
@@ -22,7 +22,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.*;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.core.Registry;
 
 import java.awt.event.InputEvent;
@@ -128,9 +128,9 @@ public class CustomEnchantmentContainer extends EnchantmentMenu {
         ItemStack itemstack = this.enchantSlots.getItem(0);
         ItemStack itemstack1 = this.enchantSlots.getItem(1);
         int i = id + 1;
-        if ((itemstack1.isEmpty() || itemstack1.getCount() < i) && !playerIn.abilities.instabuild) {
+        if ((itemstack1.isEmpty() || itemstack1.getCount() < i) && !playerIn.getAbilities().instabuild) {
             return false;
-        } else if (this.costs[id] <= 0 || itemstack.isEmpty() || (playerIn.experienceLevel < i || playerIn.experienceLevel < this.costs[id]) && !playerIn.abilities.instabuild) {
+        } else if (this.costs[id] <= 0 || itemstack.isEmpty() || (playerIn.experienceLevel < i || playerIn.experienceLevel < this.costs[id]) && !playerIn.getAbilities().instabuild) {
             return false;
         } else {
             this.worldPosCallable.execute((p_217003_6_, p_217003_7_) -> {
@@ -158,7 +158,7 @@ public class CustomEnchantmentContainer extends EnchantmentMenu {
                         }
                     }
 
-                    if (!playerIn.abilities.instabuild) {
+                    if (!playerIn.getAbilities().instabuild) {
                         itemstack1.shrink(i);
                         if (itemstack1.isEmpty()) {
                             this.enchantSlots.setItem(1, ItemStack.EMPTY);
@@ -185,7 +185,7 @@ public class CustomEnchantmentContainer extends EnchantmentMenu {
         return world.getBlockState(pos).getEnchantPowerBonus(world, pos);
     }
 
-    Random rand = new Random();
+    RandomSource rand = RandomSource.create();
     private List<EnchantmentInstance> getNewEnchantmentList(ItemStack stack, int enchantSlot, int level) {
         this.rand.setSeed((long)(this.enchantmentSeed.get() + enchantSlot));
         List<EnchantmentInstance> list = buildEnchantmentList(this.rand, stack, level, false);
@@ -198,10 +198,10 @@ public class CustomEnchantmentContainer extends EnchantmentMenu {
         return list;
     }
 
-    public static List<EnchantmentInstance> buildEnchantmentList(Random randomIn, ItemStack itemStackIn, int level, boolean allowTreasure) {
+    public static List<EnchantmentInstance> buildEnchantmentList(RandomSource randomIn, ItemStack itemStackIn, int level, boolean allowTreasure) {
         List<EnchantmentInstance> list = Lists.newArrayList();
         Item item = itemStackIn.getItem();
-        int i = itemStackIn.getItemEnchantability();
+        int i = itemStackIn.getEnchantmentValue();
         if (i <= 0) {
             return list;
         } else {
@@ -210,7 +210,7 @@ public class CustomEnchantmentContainer extends EnchantmentMenu {
             level = Mth.clamp(Math.round((float)level + (float)level * f), 1, Integer.MAX_VALUE);
             List<EnchantmentInstance> list1 = getEnchantmentDatas(level, itemStackIn, allowTreasure);
             if (!list1.isEmpty()) {
-                list.add(WeighedRandom.getRandomItem(randomIn, list1));
+                WeightedRandom.getRandomItem(randomIn, list1).ifPresent(list::add);
 
                 while(randomIn.nextInt(50) <= level) {
                     removeIncompatible(list1, Util.lastOf(list));
@@ -218,7 +218,7 @@ public class CustomEnchantmentContainer extends EnchantmentMenu {
                         break;
                     }
 
-                    list.add(WeighedRandom.getRandomItem(randomIn, list1));
+                    WeightedRandom.getRandomItem(randomIn, list1).ifPresent(list::add);
                     level /= 2;
                 }
             }

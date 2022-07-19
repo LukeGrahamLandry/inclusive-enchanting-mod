@@ -21,7 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.network.NetworkHooks;
 
 public class CustomTridentEntity extends ThrownTrident {
     public CustomTridentEntity(EntityType<? extends ThrownTrident> type, Level worldIn) {
@@ -39,7 +39,7 @@ public class CustomTridentEntity extends ThrownTrident {
         if (entity instanceof LivingEntity) {
             LivingEntity livingentity = (LivingEntity)entity;
             f += EnchantmentHelper.getDamageBonus(this.getPickupItem(), livingentity.getMobType());
-            int power = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, this.getPickupItem());
+            int power = EnchantmentHelper.getTagEnchantmentLevel(Enchantments.POWER_ARROWS, this.getPickupItem());
             if (power > 0){
                 f += (f * 0.25) * (1 + power);
             }

@@ -5,10 +5,10 @@ import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.entity.projectile.TridentEntity;
+import net.minecraft.world.entity.projectile.ThrownTrident ;
 import net.minecraft.world.inventory.AnvilMenu;
-import net.minecraft.item.*;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.*;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -219,7 +219,7 @@ public class AnvilEnchantHandler {
         } else if (!event.getName().equals(itemstack.getHoverName().getString())) {
             k = 1;
             i += k;
-            itemstack1.setHoverName(new TextComponent(event.getName()));
+            itemstack1.setHoverName(Component.literal(event.getName()));
         }
         if (flag && !itemstack1.isBookEnchantable(itemstack2)) itemstack1 = ItemStack.EMPTY;
 
@@ -232,7 +232,7 @@ public class AnvilEnchantHandler {
             levelCost = 39;
         }
 
-        if (levelCost >= 40 && !event.getPlayer().abilities.instabuild) {
+        if (levelCost >= 40 && !event.getPlayer().getAbilities().instabuild) {
             itemstack1 = ItemStack.EMPTY;
         }
 

@@ -1,7 +1,11 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.events;
 
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
+import io.github.lukegrahamlandry.inclusiveenchanting.init.DataProvider;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
@@ -10,7 +14,6 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -23,10 +26,19 @@ public class SmeltingLootModifier extends LootModifier {
         super(conditionsIn);
     }
 
+    public static Codec<SmeltingLootModifier> createCodec() {
+        return RecordCodecBuilder.create(inst -> codecStart(inst).apply(inst, SmeltingLootModifier::new));
+    }
+
+    @Override
+    public Codec<SmeltingLootModifier> codec() {
+        return DataProvider.SMELTING.get();
+    }
+
     @Nonnull
     @Override
-    public List<ItemStack> doApply(List<ItemStack> originalLoot, LootContext context) {
-        List<ItemStack> newLoot = new ArrayList<>();
+    public ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> originalLoot, LootContext context) {
+        ObjectArrayList<ItemStack> newLoot = new ObjectArrayList<>();
         for(ItemStack stack : originalLoot) {
             newLoot.add(smelt(stack, context.getLevel()));
         }
@@ -40,20 +52,5 @@ public class SmeltingLootModifier extends LootModifier {
                 .filter(itemStack -> !itemStack.isEmpty())
                 .map(itemStack -> ItemHandlerHelper.copyStackWithSize(itemStack, stack.getCount() * itemStack.getCount()))
                 .orElse(stack);
-    }
-
-    public static class Serializer extends GlobalLootModifierSerializer<SmeltingLootModifier> {
-        LootItemCondition[] conditions;
-
-        @Override
-        public SmeltingLootModifier read(ResourceLocation name, JsonObject object, LootItemCondition[] conditionsIn) {
-            this.conditions = conditionsIn;
-            return new SmeltingLootModifier(conditionsIn);
-        }
-
-        @Override
-        public JsonObject write(SmeltingLootModifier instance) {
-            return makeConditions(this.conditions);
-        }
     }
 }

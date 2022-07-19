@@ -5,22 +5,23 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.model.BookModel;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.tileentity.EnchantingTableTileEntity;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import com.mojang.math.Vector3f;
 
-public class CustomEnchantTableRenderer extends BlockEntityRenderer<CustomEnchantTableTile> {
+public class CustomEnchantTableRenderer implements BlockEntityRenderer<CustomEnchantTableTile> {
     /** The texture for the book above the enchantment table. */
     public static final Material TEXTURE_BOOK = new Material(TextureAtlas.LOCATION_BLOCKS, new ResourceLocation("entity/enchanting_table_book"));
-    private final BookModel modelBook = new BookModel();
+    private final BookModel modelBook;
 
-    public CustomEnchantTableRenderer(BlockEntityRenderDispatcher p_i226010_1_) {
-        super(p_i226010_1_);
+    public CustomEnchantTableRenderer(BlockEntityRendererProvider.Context pContext) {
+        modelBook = new BookModel(pContext.bakeLayer(ModelLayers.BOOK));
     }
 
     public void render(CustomEnchantTableTile tileEntityIn, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
