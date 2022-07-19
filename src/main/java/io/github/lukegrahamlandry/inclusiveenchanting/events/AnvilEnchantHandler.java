@@ -2,13 +2,13 @@ package io.github.lukegrahamlandry.inclusiveenchanting.events;
 
 import com.google.common.collect.Sets;
 import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.entity.projectile.TridentEntity;
-import net.minecraft.inventory.container.RepairContainer;
+import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.item.*;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,23 +22,31 @@ import java.util.function.Function;
 // in vanilla any enchant can be applied if in creative or if right item is a book
 // I can change that if requested
 
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.DiggerItem;
+import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.TridentItem;
+
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AnvilEnchantHandler {
     private static HashMap<Enchantment, Function<ItemStack, Boolean>> validEnchants = new HashMap<>();
     private static List<Set<Enchantment>> incompatibleEnchants = new ArrayList<>();
 
     public static void initNewValidEnchants(){
-        validEnchants.put(Enchantments.FLAME, (item) -> item.getItem().isCrossbow(item));
-        validEnchants.put(Enchantments.PUNCH, (item) -> item.getItem().isCrossbow(item));
+        validEnchants.put(Enchantments.FLAMING_ARROWS, (item) -> item.getItem().useOnRelease(item));
+        validEnchants.put(Enchantments.PUNCH_ARROWS, (item) -> item.getItem().useOnRelease(item));
         validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem || item.getItem() instanceof TridentItem);
-        validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof ToolItem);
+        validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof DiggerItem);
         validEnchants.put(Enchantments.QUICK_CHARGE, (item) -> item.getItem() instanceof BowItem);
         validEnchants.put(Enchantments.KNOCKBACK, (item) -> item.getItem() instanceof ShieldItem);
-        validEnchants.put(Enchantments.POWER, (item) -> item.getItem() instanceof TridentItem);
+        validEnchants.put(Enchantments.POWER_ARROWS, (item) -> item.getItem() instanceof TridentItem);
 
-        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAME, Enchantments.MULTISHOT, Enchantments.PIERCING));
-        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.FORTUNE));
-        incompatibleEnchants.add(Sets.newHashSet(Enchantments.QUICK_CHARGE, Enchantments.POWER, Enchantments.IMPALING));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAMING_ARROWS, Enchantments.MULTISHOT, Enchantments.PIERCING));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.BLOCK_FORTUNE));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.QUICK_CHARGE, Enchantments.POWER_ARROWS, Enchantments.IMPALING));
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.CHANNELING, Enchantments.RIPTIDE, Enchantments.PIERCING));
     }
 
@@ -50,7 +58,7 @@ public class AnvilEnchantHandler {
     }
 
     private static boolean isWrongItem(AnvilUpdateEvent event) {
-        return !event.getRight().isEmpty() && event.getRight().isDamageable() && event.getLeft().getItem() != event.getRight().getItem();
+        return !event.getRight().isEmpty() && event.getRight().isDamageableItem() && event.getLeft().getItem() != event.getRight().getItem();
     }
 
     public static boolean isNewValid(Enchantment enchant, ItemStack stack){
@@ -84,7 +92,7 @@ public class AnvilEnchantHandler {
 
             addEnchants.forEach((enchant, level) -> {
                 // check if it can be applied on this tool
-                boolean oldValid = enchant.canApply(tool);
+                boolean oldValid = enchant.canEnchant(tool);
                 boolean newValid = isNewValid(enchant, tool); // validEnchants.containsKey(enchant) && validEnchants.get(enchant).apply(tool);
                 if (!oldValid && !newValid) return;
 
@@ -153,40 +161,40 @@ public class AnvilEnchantHandler {
         int k = 0;
         ItemStack itemstack1 = itemstack.copy();
         ItemStack itemstack2 = event.getRight();
-        j = j + itemstack.getRepairCost() + (itemstack2.isEmpty() ? 0 : itemstack2.getRepairCost());
+        j = j + itemstack.getBaseRepairCost() + (itemstack2.isEmpty() ? 0 : itemstack2.getBaseRepairCost());
         int materialCost = 0;
         int levelCost = 0;
         boolean flag = false;
 
         if (!itemstack2.isEmpty()) {
             flag = itemstack2.getItem() == Items.ENCHANTED_BOOK && !EnchantedBookItem.getEnchantments(itemstack2).isEmpty();
-            if (itemstack1.isDamageable() && itemstack1.getItem().getIsRepairable(itemstack, itemstack2)) {
-                int l2 = Math.min(itemstack1.getDamage(), itemstack1.getMaxDamage() / 4);
+            if (itemstack1.isDamageableItem() && itemstack1.getItem().isValidRepairItem(itemstack, itemstack2)) {
+                int l2 = Math.min(itemstack1.getDamageValue(), itemstack1.getMaxDamage() / 4);
                 if (l2 <= 0) {
-                    // this.field_234642_c_.setInventorySlotContents(0, ItemStack.EMPTY);
+                    // this.resultSlots.setInventorySlotContents(0, ItemStack.EMPTY);
                     levelCost = 0;
                     return;
                 }
 
                 int i3;
                 for(i3 = 0; l2 > 0 && i3 < itemstack2.getCount(); ++i3) {
-                    int j3 = itemstack1.getDamage() - l2;
-                    itemstack1.setDamage(j3);
+                    int j3 = itemstack1.getDamageValue() - l2;
+                    itemstack1.setDamageValue(j3);
                     ++i;
-                    l2 = Math.min(itemstack1.getDamage(), itemstack1.getMaxDamage() / 4);
+                    l2 = Math.min(itemstack1.getDamageValue(), itemstack1.getMaxDamage() / 4);
                 }
 
                 materialCost = i3;
             } else {
-                if (!flag && (itemstack1.getItem() != itemstack2.getItem() || !itemstack1.isDamageable())) {
-                    // this.field_234642_c_.setInventorySlotContents(0, ItemStack.EMPTY);
+                if (!flag && (itemstack1.getItem() != itemstack2.getItem() || !itemstack1.isDamageableItem())) {
+                    // this.resultSlots.setInventorySlotContents(0, ItemStack.EMPTY);
                     levelCost = 0;
                     return;
                 }
 
-                if (itemstack1.isDamageable() && !flag) {
-                    int l = itemstack.getMaxDamage() - itemstack.getDamage();
-                    int i1 = itemstack2.getMaxDamage() - itemstack2.getDamage();
+                if (itemstack1.isDamageableItem() && !flag) {
+                    int l = itemstack.getMaxDamage() - itemstack.getDamageValue();
+                    int i1 = itemstack2.getMaxDamage() - itemstack2.getDamageValue();
                     int j1 = i1 + itemstack1.getMaxDamage() * 12 / 100;
                     int k1 = l + j1;
                     int l1 = itemstack1.getMaxDamage() - k1;
@@ -194,8 +202,8 @@ public class AnvilEnchantHandler {
                         l1 = 0;
                     }
 
-                    if (l1 < itemstack1.getDamage()) {
-                        itemstack1.setDamage(l1);
+                    if (l1 < itemstack1.getDamageValue()) {
+                        itemstack1.setDamageValue(l1);
                         i += 2;
                     }
                 }
@@ -203,15 +211,15 @@ public class AnvilEnchantHandler {
         }
 
         if (StringUtils.isBlank(event.getName())) {
-            if (itemstack.hasDisplayName()) {
+            if (itemstack.hasCustomHoverName()) {
                 k = 1;
                 i += k;
-                itemstack1.clearCustomName();
+                itemstack1.resetHoverName();
             }
-        } else if (!event.getName().equals(itemstack.getDisplayName().getString())) {
+        } else if (!event.getName().equals(itemstack.getHoverName().getString())) {
             k = 1;
             i += k;
-            itemstack1.setDisplayName(new StringTextComponent(event.getName()));
+            itemstack1.setHoverName(new TextComponent(event.getName()));
         }
         if (flag && !itemstack1.isBookEnchantable(itemstack2)) itemstack1 = ItemStack.EMPTY;
 
@@ -224,18 +232,18 @@ public class AnvilEnchantHandler {
             levelCost = 39;
         }
 
-        if (levelCost >= 40 && !event.getPlayer().abilities.isCreativeMode) {
+        if (levelCost >= 40 && !event.getPlayer().abilities.instabuild) {
             itemstack1 = ItemStack.EMPTY;
         }
 
         if (!itemstack1.isEmpty()) {
-            int k2 = itemstack1.getRepairCost();
-            if (!itemstack2.isEmpty() && k2 < itemstack2.getRepairCost()) {
-                k2 = itemstack2.getRepairCost();
+            int k2 = itemstack1.getBaseRepairCost();
+            if (!itemstack2.isEmpty() && k2 < itemstack2.getBaseRepairCost()) {
+                k2 = itemstack2.getBaseRepairCost();
             }
 
             if (k != i || k == 0) {
-                k2 = RepairContainer.getNewRepairCost(k2);
+                k2 = AnvilMenu.calculateIncreasedRepairCost(k2);
             }
 
             itemstack1.setRepairCost(k2);

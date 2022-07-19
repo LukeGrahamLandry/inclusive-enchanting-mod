@@ -1,51 +1,51 @@
 package io.github.lukegrahamlandry.inclusiveenchanting;
 
 import io.github.lukegrahamlandry.inclusiveenchanting.init.TileEntityInit;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.INameable;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.Nameable;
+import net.minecraft.util.Mth;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class CustomEnchantTableTile extends TileEntity implements INameable, ITickableTileEntity {
+public class CustomEnchantTableTile extends BlockEntity implements Nameable, TickableBlockEntity {
     public int ticks;
-    public float field_195523_f;
-    public float field_195524_g;
-    public float field_195525_h;
-    public float field_195526_i;
+    public float flip;
+    public float oFlip;
+    public float flipT;
+    public float flipA;
     public float nextPageTurningSpeed;
     public float pageTurningSpeed;
     public float nextPageAngle;
     public float pageAngle;
-    public float field_195531_n;
+    public float tRot;
     private static final Random random = new Random();
-    private ITextComponent customname;
+    private Component customname;
 
     public CustomEnchantTableTile() {
         super(TileEntityInit.ENCHANTING_TABLE.get());
     }
 
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
+    public CompoundTag save(CompoundTag compound) {
+        super.save(compound);
         if (this.hasCustomName()) {
-            compound.putString("CustomName", ITextComponent.Serializer.toJson(this.customname));
+            compound.putString("CustomName", Component.Serializer.toJson(this.customname));
         }
 
         return compound;
     }
 
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(BlockState state, CompoundTag nbt) {
+        super.load(state, nbt);
         if (nbt.contains("CustomName", 8)) {
-            this.customname = ITextComponent.Serializer.getComponentFromJson(nbt.getString("CustomName"));
+            this.customname = Component.Serializer.fromJson(nbt.getString("CustomName"));
         }
 
     }
@@ -53,21 +53,21 @@ public class CustomEnchantTableTile extends TileEntity implements INameable, ITi
     public void tick() {
         this.pageTurningSpeed = this.nextPageTurningSpeed;
         this.pageAngle = this.nextPageAngle;
-        PlayerEntity playerentity = this.world.getClosestPlayer((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D, 3.0D, false);
+        Player playerentity = this.level.getNearestPlayer((double)this.worldPosition.getX() + 0.5D, (double)this.worldPosition.getY() + 0.5D, (double)this.worldPosition.getZ() + 0.5D, 3.0D, false);
         if (playerentity != null) {
-            double d0 = playerentity.getPosX() - ((double)this.pos.getX() + 0.5D);
-            double d1 = playerentity.getPosZ() - ((double)this.pos.getZ() + 0.5D);
-            this.field_195531_n = (float) MathHelper.atan2(d1, d0);
+            double d0 = playerentity.getX() - ((double)this.worldPosition.getX() + 0.5D);
+            double d1 = playerentity.getZ() - ((double)this.worldPosition.getZ() + 0.5D);
+            this.tRot = (float) Mth.atan2(d1, d0);
             this.nextPageTurningSpeed += 0.1F;
             if (this.nextPageTurningSpeed < 0.5F || random.nextInt(40) == 0) {
-                float f1 = this.field_195525_h;
+                float f1 = this.flipT;
 
                 do {
-                    this.field_195525_h += (float)(random.nextInt(4) - random.nextInt(4));
-                } while(f1 == this.field_195525_h);
+                    this.flipT += (float)(random.nextInt(4) - random.nextInt(4));
+                } while(f1 == this.flipT);
             }
         } else {
-            this.field_195531_n += 0.02F;
+            this.tRot += 0.02F;
             this.nextPageTurningSpeed -= 0.1F;
         }
 
@@ -79,16 +79,16 @@ public class CustomEnchantTableTile extends TileEntity implements INameable, ITi
             this.nextPageAngle += ((float)Math.PI * 2F);
         }
 
-        while(this.field_195531_n >= (float)Math.PI) {
-            this.field_195531_n -= ((float)Math.PI * 2F);
+        while(this.tRot >= (float)Math.PI) {
+            this.tRot -= ((float)Math.PI * 2F);
         }
 
-        while(this.field_195531_n < -(float)Math.PI) {
-            this.field_195531_n += ((float)Math.PI * 2F);
+        while(this.tRot < -(float)Math.PI) {
+            this.tRot += ((float)Math.PI * 2F);
         }
 
         float f2;
-        for(f2 = this.field_195531_n - this.nextPageAngle; f2 >= (float)Math.PI; f2 -= ((float)Math.PI * 2F)) {
+        for(f2 = this.tRot - this.nextPageAngle; f2 >= (float)Math.PI; f2 -= ((float)Math.PI * 2F)) {
         }
 
         while(f2 < -(float)Math.PI) {
@@ -96,26 +96,26 @@ public class CustomEnchantTableTile extends TileEntity implements INameable, ITi
         }
 
         this.nextPageAngle += f2 * 0.4F;
-        this.nextPageTurningSpeed = MathHelper.clamp(this.nextPageTurningSpeed, 0.0F, 1.0F);
+        this.nextPageTurningSpeed = Mth.clamp(this.nextPageTurningSpeed, 0.0F, 1.0F);
         ++this.ticks;
-        this.field_195524_g = this.field_195523_f;
-        float f = (this.field_195525_h - this.field_195523_f) * 0.4F;
+        this.oFlip = this.flip;
+        float f = (this.flipT - this.flip) * 0.4F;
         float f3 = 0.2F;
-        f = MathHelper.clamp(f, -0.2F, 0.2F);
-        this.field_195526_i += (f - this.field_195526_i) * 0.9F;
-        this.field_195523_f += this.field_195526_i;
+        f = Mth.clamp(f, -0.2F, 0.2F);
+        this.flipA += (f - this.flipA) * 0.9F;
+        this.flip += this.flipA;
     }
 
-    public ITextComponent getName() {
-        return (ITextComponent)(this.customname != null ? this.customname : new TranslationTextComponent("container.enchant"));
+    public Component getName() {
+        return (Component)(this.customname != null ? this.customname : new TranslatableComponent("container.enchant"));
     }
 
-    public void setCustomName(@Nullable ITextComponent name) {
+    public void setCustomName(@Nullable Component name) {
         this.customname = name;
     }
 
     @Nullable
-    public ITextComponent getCustomName() {
+    public Component getCustomName() {
         return this.customname;
     }
 }

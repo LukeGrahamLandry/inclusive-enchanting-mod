@@ -2,13 +2,13 @@ package io.github.lukegrahamlandry.inclusiveenchanting.init;
 
 import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
 import io.github.lukegrahamlandry.inclusiveenchanting.events.SmeltingLootModifier;
-import net.minecraft.advancements.criterion.EnchantmentPredicate;
-import net.minecraft.advancements.criterion.ItemPredicate;
-import net.minecraft.advancements.criterion.MinMaxBounds;
+import net.minecraft.advancements.critereon.EnchantmentPredicate;
+import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.loot.conditions.MatchTool;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraftforge.common.data.GlobalLootModifierProvider;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.fml.RegistryObject;
@@ -27,10 +27,10 @@ public class DataProvider extends GlobalLootModifierProvider {
     protected void start() {
         // it seems like this replaces the json but im afraid to get rid of it just incase
         add("smelting", SMELTING.get(), new SmeltingLootModifier(
-                new ILootCondition[]{
-                        MatchTool.builder(
-                                ItemPredicate.Builder.create().enchantment(
-                                        new EnchantmentPredicate(Enchantments.FIRE_ASPECT, MinMaxBounds.IntBound.atLeast(1))))
+                new LootItemCondition[]{
+                        MatchTool.toolMatches(
+                                ItemPredicate.Builder.item().hasEnchantment(
+                                        new EnchantmentPredicate(Enchantments.FIRE_ASPECT, MinMaxBounds.Ints.atLeast(1))))
                                 .build()
                 })
         );
