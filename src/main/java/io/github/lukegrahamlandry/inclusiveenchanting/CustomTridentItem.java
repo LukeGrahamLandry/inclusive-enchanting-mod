@@ -18,9 +18,10 @@ import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.TridentEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.TridentItem;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
@@ -31,10 +32,6 @@ import net.minecraft.world.World;
 public class CustomTridentItem extends TridentItem {
     public CustomTridentItem(Item.Properties properties) {
         super(properties.setISTER(() -> ISTER::new));
-
-        ItemModelsProperties.registerProperty(this, new ResourceLocation("throwing"), (p_239419_0_, p_239419_1_, p_239419_2_) -> {
-            return p_239419_2_ != null && p_239419_2_.isHandActive() && p_239419_2_.getActiveItemStack() == p_239419_0_ ? 1.0F : 0.0F;
-        });
     }
 
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
