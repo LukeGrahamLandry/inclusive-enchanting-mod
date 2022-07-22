@@ -1,7 +1,6 @@
 # Inclusive Enchanting Mod 
 
-A Minecraft mod for forge 1.16.5 that allows some enchantments to effect extra items.  
-Commissioned by Dynam0, see [worklog](worklog.txt) for payment information. 
+A Minecraft mod for forge 1.19 that allows some enchantments to effect extra items.  
 
 ## Features
 - **Anvil and Enchantment Table can apply some enchants to extra items**
@@ -14,3 +13,7 @@ Commissioned by Dynam0, see [worklog](worklog.txt) for payment information.
     - flame / piercing / multishot
     - fire aspect / fortune / silk touch
     - quick charge / power / impaling 
+
+## Mixins
+
+should really use them
