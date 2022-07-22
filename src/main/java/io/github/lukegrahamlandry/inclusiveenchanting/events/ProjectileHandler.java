@@ -1,35 +1,35 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.events;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ProjectileHandler {
     @SubscribeEvent
-    public static void flameCrossbow(EntityJoinWorldEvent event){
+    public static void flameCrossbow(EntityJoinLevelEvent event){
         Entity entity = event.getEntity();
-        if (entity.getEntityWorld().isRemote()) return;
-        if (!(entity instanceof AbstractArrowEntity)) return;
-        AbstractArrowEntity arrow = (AbstractArrowEntity) entity;
-        Entity shooter = arrow.func_234616_v_();  // change this to getShooter when mappings update
+        if (entity.getCommandSenderWorld().isClientSide()) return;
+        if (!(entity instanceof AbstractArrow)) return;
+        AbstractArrow arrow = (AbstractArrow) entity;
+        Entity shooter = arrow.getOwner();  // change this to getShooter when mappings update
         if (!(shooter instanceof LivingEntity)) return;
 
-        if (arrow.getShotFromCrossbow()){
-            boolean hasFlame = EnchantmentHelper.getMaxEnchantmentLevel(Enchantments.FLAME, (LivingEntity) shooter) > 0;
+        if (arrow.shotFromCrossbow()){
+            boolean hasFlame = EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAMING_ARROWS, (LivingEntity) shooter) > 0;
             if (hasFlame){
-                arrow.setFire(100);
+                arrow.setSecondsOnFire(100);
             }
 
-            int punchLevel = EnchantmentHelper.getMaxEnchantmentLevel(Enchantments.PUNCH, (LivingEntity) shooter);
-            arrow.setKnockbackStrength(punchLevel);
+            int punchLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH_ARROWS, (LivingEntity) shooter);
+            arrow.setKnockback(punchLevel);
         } else {
-            int pircingLevel = EnchantmentHelper.getMaxEnchantmentLevel(Enchantments.PIERCING, (LivingEntity) shooter);
+            int pircingLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.PIERCING, (LivingEntity) shooter);
             if (pircingLevel > 0) {
                 arrow.setPierceLevel((byte)pircingLevel);
             }

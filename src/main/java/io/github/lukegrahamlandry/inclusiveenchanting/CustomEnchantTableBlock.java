@@ -1,36 +1,52 @@
 package io.github.lukegrahamlandry.inclusiveenchanting;
 
-import net.minecraft.block.*;
-import net.minecraft.inventory.container.EnchantmentContainer;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.inventory.container.SimpleNamedContainerProvider;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.EnchantingTableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.INameable;
-import net.minecraft.util.IWorldPosCallable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import io.github.lukegrahamlandry.inclusiveenchanting.init.TileEntityInit;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.inventory.EnchantmentMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.Nameable;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
-public class CustomEnchantTableBlock extends EnchantingTableBlock {
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EnchantmentTableBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+
+import javax.annotation.Nullable;
+
+public class CustomEnchantTableBlock extends EnchantmentTableBlock {
     public CustomEnchantTableBlock() {
-        super(AbstractBlock.Properties.from(Blocks.ENCHANTING_TABLE));
+        super(BlockBehaviour.Properties.copy(Blocks.ENCHANTING_TABLE));
     }
 
     @Override
-    public INamedContainerProvider getContainer(BlockState state, World worldIn, BlockPos pos) {
+    public MenuProvider getMenuProvider(BlockState state, Level worldIn, BlockPos pos) {
         InclusiveEnchanting.LOGGER.debug("get container");
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        ITextComponent itextcomponent = ((INameable)tileentity).getDisplayName();
-        return new SimpleNamedContainerProvider((id, inventory, player) -> {
-            return new CustomEnchantmentContainer(id, inventory, IWorldPosCallable.of(worldIn, pos));
+        BlockEntity tileentity = worldIn.getBlockEntity(pos);
+        Component itextcomponent = ((Nameable)tileentity).getDisplayName();
+        return new SimpleMenuProvider((id, inventory, player) -> {
+            return new CustomEnchantmentContainer(id, inventory, ContainerLevelAccess.create(worldIn, pos));
         }, itextcomponent);
     }
 
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return new CustomEnchantTableTile();
+    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+        return new CustomEnchantTableTile(pPos, pState);
     }
+
+   @Nullable
+   @Override
+   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
+      return pLevel.isClientSide ? createTickerHelper(pBlockEntityType, TileEntityInit.ENCHANTING_TABLE.get(), CustomEnchantTableTile::bookAnimationTick) : null;
+   }
 
 }
