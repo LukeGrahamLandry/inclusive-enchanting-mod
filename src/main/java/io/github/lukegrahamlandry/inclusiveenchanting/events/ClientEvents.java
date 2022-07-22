@@ -15,7 +15,9 @@ import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ThrownTridentRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -37,6 +39,10 @@ public class ClientEvents {
             Minecraft.getInstance().getItemRenderer().getItemModelShaper().register(ItemInit.CUSTOM_TRIDENT.get(), new ModelResourceLocation("minecraft:trident_in_hand#inventory"));
 
             MenuScreens.register(ContainerInit.ENCHANT_TABLE.get(), EnchantmentScreen::new);
+
+            ItemProperties.register(ItemInit.CUSTOM_TRIDENT.get(), new ResourceLocation("throwing"), (p_239419_0_, p_239419_1_, p_239419_2_, seed) -> {
+                return p_239419_2_ != null && p_239419_2_.isUsingItem() && p_239419_2_.getUseItem() == p_239419_0_ ? 1.0F : 0.0F;
+            });
         }
 
         @SubscribeEvent

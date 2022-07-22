@@ -5,7 +5,7 @@ plugins {
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-version = '1.1.17'
+version = '1.1.18'
 group = 'io.github.lukegrahamlandry.inclusiveenchanting' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'inclusiveenchanting'
 
