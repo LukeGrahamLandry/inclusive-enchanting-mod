@@ -1,14 +1,17 @@
 package io.github.lukegrahamlandry.inclusiveenchanting;
 
 import com.google.common.collect.Sets;
-import io.github.lukegrahamlandry.inclusiveenchanting.events.DataProvider;
+import io.github.lukegrahamlandry.inclusiveenchanting.events.SmeltingLootModifier;
 import io.github.lukegrahamlandry.inclusiveenchanting.legacy.RegistryInit;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,6 +43,14 @@ public class InclusiveEnchanting {
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.CHANNELING, Enchantments.RIPTIDE, Enchantments.PIERCING));
 
         RegistryInit.init();
+        initLootModifier();
+    }
+
+    private void initLootModifier(){
+        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        DeferredRegister<GlobalLootModifierSerializer<?>> LOOT_MODIFIERS = DeferredRegister.create(ForgeRegistries.LOOT_MODIFIER_SERIALIZERS, InclusiveEnchanting.MOD_ID);
+        LOOT_MODIFIERS.register("smelting", SmeltingLootModifier.Serializer::new);
+        LOOT_MODIFIERS.register(eventBus);
     }
 
     public static boolean isNewValid(Enchantment enchant, ItemStack stack){
@@ -54,13 +65,5 @@ public class InclusiveEnchanting {
         }
 
         return false;
-    }
-
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class ModEvent{
-        @SubscribeEvent
-        public static void runData(GatherDataEvent event){
-            event.getGenerator().addProvider(new DataProvider(event.getGenerator(), MOD_ID));
-        }
     }
 }

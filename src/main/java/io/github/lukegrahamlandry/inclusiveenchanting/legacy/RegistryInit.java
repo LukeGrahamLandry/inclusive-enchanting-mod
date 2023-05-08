@@ -1,7 +1,6 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.legacy;
 
 import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
-import io.github.lukegrahamlandry.inclusiveenchanting.events.DataProvider;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
@@ -36,7 +35,6 @@ public class RegistryInit {
 
     public static void init(){
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        DataProvider.LOOT_MODIFIERS.register(eventBus);
         ITEMS.register(eventBus);
         BLOCKS.register(eventBus);
         TILE_ENTITY_TYPES.register(eventBus);

@@ -1,7 +1,6 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.events;
 
 import com.google.gson.JsonObject;
-import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipe;
@@ -28,7 +27,6 @@ public class SmeltingLootModifier extends LootModifier {
     public List<ItemStack> doApply(List<ItemStack> originalLoot, LootContext context) {
         List<ItemStack> newLoot = new ArrayList<>();
         for(ItemStack stack : originalLoot) {
-            InclusiveEnchanting.LOGGER.debug("autosmelt {}", stack);
             newLoot.add(smelt(stack, context.getWorld()));
         }
 
@@ -43,6 +41,7 @@ public class SmeltingLootModifier extends LootModifier {
                 .orElse(stack);
     }
 
+    // The conditions in the json file make sure that it only applies when the tool has fire aspect.
     public static class Serializer extends GlobalLootModifierSerializer<SmeltingLootModifier> {
         ILootCondition[] conditions;
 
