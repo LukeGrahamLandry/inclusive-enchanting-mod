@@ -1,29 +1,36 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.events;
 
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
-import io.github.lukegrahamlandry.inclusiveenchanting.init.DataProvider;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
+import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SmeltingLootModifier extends LootModifier {
+    private static final DeferredRegister<Codec<? extends IGlobalLootModifier>> LOOT_MODIFIERS = DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, InclusiveEnchanting.MOD_ID);
+    private static final RegistryObject<Codec<SmeltingLootModifier>> SMELTING = LOOT_MODIFIERS.register("smelting", SmeltingLootModifier::createCodec);
+
     public SmeltingLootModifier(LootItemCondition[] conditionsIn) {
         super(conditionsIn);
+    }
+
+    public static void init() {
+        LOOT_MODIFIERS.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
     public static Codec<SmeltingLootModifier> createCodec() {
@@ -32,7 +39,7 @@ public class SmeltingLootModifier extends LootModifier {
 
     @Override
     public Codec<SmeltingLootModifier> codec() {
-        return DataProvider.SMELTING.get();
+        return SMELTING.get();
     }
 
     @Nonnull

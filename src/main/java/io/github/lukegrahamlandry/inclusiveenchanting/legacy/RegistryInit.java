@@ -1,14 +1,14 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.legacy;
 
 import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 // This was one of the first mods I ever made and I didn't know that mixins existed at the time.
 // So instead I used a clunky form of registry replacement where I just swapped some blocks
@@ -22,9 +22,9 @@ public class RegistryInit {
     static final RegistryObject<Block> CUSTOM_ENCHANT_TABLE = BLOCKS.register("custom_enchanting_table",
             CustomEnchantTable::new);
 
-    static final DeferredRegister<TileEntityType<?>> TILE_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, InclusiveEnchanting.MOD_ID);
-    static final RegistryObject<TileEntityType<CustomEnchantTable.Tile>> ENCHANTING_TABLE
-            = TILE_ENTITY_TYPES.register("custom_enchanting_table", () -> TileEntityType.Builder.of(CustomEnchantTable.Tile::new, CUSTOM_ENCHANT_TABLE.get()).build(null));
+    static final DeferredRegister<BlockEntityType<?>> TILE_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, InclusiveEnchanting.MOD_ID);
+    static final RegistryObject<BlockEntityType<CustomEnchantTable.Tile>> ENCHANTING_TABLE
+            = TILE_ENTITY_TYPES.register("custom_enchanting_table", () -> BlockEntityType.Builder.of(CustomEnchantTable.Tile::new, CUSTOM_ENCHANT_TABLE.get()).build(null));
 
     static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, InclusiveEnchanting.MOD_ID);
     static final RegistryObject<Item> CUSTOM_TRIDENT = ITEMS.register("custom_trident",

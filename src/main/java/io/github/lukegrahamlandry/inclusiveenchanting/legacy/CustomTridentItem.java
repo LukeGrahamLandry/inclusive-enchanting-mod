@@ -1,12 +1,12 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.legacy;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.TridentItem;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.level.Level;
 
 @Deprecated
 class CustomTridentItem extends TridentItem {
@@ -15,11 +15,11 @@ class CustomTridentItem extends TridentItem {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity player, int slot, boolean selected) {
-        if (player instanceof PlayerEntity) {
+    public void inventoryTick(ItemStack stack, Level world, Entity player, int slot, boolean selected) {
+        if (player instanceof Player p) {
             ItemStack trident = new ItemStack(Items.TRIDENT);
             trident.setTag(stack.getOrCreateTag());
-            ((PlayerEntity) player).inventory.setItem(slot, trident);
+            p.getInventory().setItem(slot, trident);
         }
     }
 }

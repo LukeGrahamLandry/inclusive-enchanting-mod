@@ -1,22 +1,20 @@
 package io.github.lukegrahamlandry.inclusiveenchanting;
 
-import io.github.lukegrahamlandry.inclusiveenchanting.events.AnvilEnchantHandler;
-import io.github.lukegrahamlandry.inclusiveenchanting.init.*;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import com.google.common.collect.Sets;
+import io.github.lukegrahamlandry.inclusiveenchanting.events.SmeltingLootModifier;
+import io.github.lukegrahamlandry.inclusiveenchanting.legacy.RegistryInit;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 
 @Mod(InclusiveEnchanting.MOD_ID)
 public class InclusiveEnchanting{
@@ -29,7 +27,7 @@ public class InclusiveEnchanting{
         validEnchants.put(Enchantments.FLAMING_ARROWS, (item) -> item.getItem() instanceof CrossbowItem);
         validEnchants.put(Enchantments.PUNCH_ARROWS, (item) -> item.getItem() instanceof CrossbowItem);
         validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem || item.getItem() instanceof TridentItem);
-        validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof ToolItem);
+        validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof DiggerItem);
         validEnchants.put(Enchantments.QUICK_CHARGE, (item) -> item.getItem() instanceof BowItem);
         validEnchants.put(Enchantments.KNOCKBACK, (item) -> item.getItem() instanceof ShieldItem);
         validEnchants.put(Enchantments.POWER_ARROWS, (item) -> item.getItem() instanceof TridentItem);
@@ -40,14 +38,7 @@ public class InclusiveEnchanting{
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.CHANNELING, Enchantments.RIPTIDE, Enchantments.PIERCING));
 
         RegistryInit.init();
-        initLootModifier();
-    }
-
-    private void initLootModifier(){
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        DeferredRegister<Codec<? extends IGlobalLootModifier>>LOOT_MODIFIERS = DeferredRegister.create(ForgeRegistries.LOOT_MODIFIER_SERIALIZERS, InclusiveEnchanting.MOD_ID);
-        LOOT_MODIFIERS.register("smelting", SmeltingLootModifier::createCodec);
-        LOOT_MODIFIERS.register(eventBus);
+        SmeltingLootModifier.init();
     }
 
     public static boolean isNewValid(Enchantment enchant, ItemStack stack){
