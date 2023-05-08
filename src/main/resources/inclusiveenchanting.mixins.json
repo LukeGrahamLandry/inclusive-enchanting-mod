@@ -5,9 +5,12 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "inclusiveenchanting.refmap.json",
   "mixins": [
-    "EnchantmentMixin"
+    "EnchantmentMixin",
+    "TridentEntityMixin",
+    "TridentItemMixin"
   ],
   "client": [
+    "FirstPersonRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

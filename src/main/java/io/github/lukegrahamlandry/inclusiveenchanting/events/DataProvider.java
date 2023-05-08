@@ -1,4 +1,4 @@
-package io.github.lukegrahamlandry.inclusiveenchanting.init;
+package io.github.lukegrahamlandry.inclusiveenchanting.events;
 
 import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
 import io.github.lukegrahamlandry.inclusiveenchanting.events.SmeltingLootModifier;

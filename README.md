@@ -13,7 +13,3 @@ A Minecraft mod for forge 1.16.5 that allows some enchantments to effect extra i
     - flame / piercing / multishot
     - fire aspect / fortune / silk touch
     - quick charge / power / impaling 
-
-## Mixins 
-
-should really use them
