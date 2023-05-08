@@ -13,52 +13,54 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
-@Mod("inclusiveenchanting")
+@Mod(InclusiveEnchanting.MOD_ID)
 public class InclusiveEnchanting{
-    // Directly reference a log4j logger.
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MOD_ID = "inclusiveenchanting";
+    private static final HashMap<Enchantment, Function<ItemStack, Boolean>> validEnchants = new HashMap<>();
+    private static final List<Set<Enchantment>> incompatibleEnchants = new ArrayList<>();
 
     public InclusiveEnchanting() {
-        AnvilEnchantHandler.initNewValidEnchants();
+        validEnchants.put(Enchantments.FLAMING_ARROWS, (item) -> item.getItem() instanceof CrossbowItem);
+        validEnchants.put(Enchantments.PUNCH_ARROWS, (item) -> item.getItem() instanceof CrossbowItem);
+        validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem || item.getItem() instanceof TridentItem);
+        validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof ToolItem);
+        validEnchants.put(Enchantments.QUICK_CHARGE, (item) -> item.getItem() instanceof BowItem);
+        validEnchants.put(Enchantments.KNOCKBACK, (item) -> item.getItem() instanceof ShieldItem);
+        validEnchants.put(Enchantments.POWER_ARROWS, (item) -> item.getItem() instanceof TridentItem);
+
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAMING_ARROWS, Enchantments.MULTISHOT, Enchantments.PIERCING));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.BLOCK_FORTUNE));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.QUICK_CHARGE, Enchantments.POWER_ARROWS, Enchantments.IMPALING));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.CHANNELING, Enchantments.RIPTIDE, Enchantments.PIERCING));
+
+        RegistryInit.init();
+        initLootModifier();
+    }
+
+    private void initLootModifier(){
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        DataProvider.LOOT_MODIFIERS.register(eventBus);
-        EntityInit.ENTITY_TYPES.register(eventBus);
-        ItemInit.ITEMS.register(eventBus);
-        BlockInit.BLOCKS.register(eventBus);
-        TileEntityInit.TILE_ENTITY_TYPES.register(eventBus);
-        ContainerInit.CONTAINER_TYPES.register(eventBus);
+        DeferredRegister<Codec<? extends IGlobalLootModifier>>LOOT_MODIFIERS = DeferredRegister.create(ForgeRegistries.LOOT_MODIFIER_SERIALIZERS, InclusiveEnchanting.MOD_ID);
+        LOOT_MODIFIERS.register("smelting", SmeltingLootModifier::createCodec);
+        LOOT_MODIFIERS.register(eventBus);
     }
 
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class ModEvent {
-        @SubscribeEvent
-        public static void runData(GatherDataEvent event){
-            event.getGenerator().addProvider(event.includeServer(), new DataProvider(event.getGenerator(), MOD_ID));
-        }
+    public static boolean isNewValid(Enchantment enchant, ItemStack stack){
+        return validEnchants.containsKey(enchant) && validEnchants.get(enchant).apply(stack);
     }
 
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-    public static class ForgeEvent {
-        @SubscribeEvent
-        public static void replaceEnchantTable(BlockEvent.EntityPlaceEvent event){
-            if (!event.getEntity().getCommandSenderWorld().isClientSide() && event.getPlacedBlock().getBlock() == Blocks.ENCHANTING_TABLE){
-                event.getBlockSnapshot().getLevel().setBlock(event.getBlockSnapshot().getPos(), BlockInit.CUSTOM_ENCHANT_TABLE.get().defaultBlockState(), 2);
-                // event.setCanceled(true);
+    public static boolean areNewIncompatible(Enchantment enchant, Enchantment enchant2){
+        for (Set<Enchantment> enchantGroup : incompatibleEnchants){
+            if (!enchant.equals(enchant2) && enchantGroup.contains(enchant) && enchantGroup.contains(enchant2)){
+                return true;
             }
         }
 
-        @SubscribeEvent
-        public static void replaceTrident(TickEvent.PlayerTickEvent event){
-            if (!event.player.getCommandSenderWorld().isClientSide() && event.player.getItemInHand(InteractionHand.MAIN_HAND).getItem() == Items.TRIDENT){
-                ItemStack newTrident = new ItemStack(ItemInit.CUSTOM_TRIDENT.get());
-                newTrident.setTag(event.player.getItemInHand(InteractionHand.MAIN_HAND).getTag());
-                event.player.setItemInHand(InteractionHand.MAIN_HAND, newTrident);
-            }
-        }
+        return false;
     }
 }

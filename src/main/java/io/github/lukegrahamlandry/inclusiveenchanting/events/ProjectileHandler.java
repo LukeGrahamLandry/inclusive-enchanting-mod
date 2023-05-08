@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ProjectileHandler {
     @SubscribeEvent
-    public static void flameCrossbow(EntityJoinLevelEvent event){
+    public static void handleArrowShot(EntityJoinLevelEvent event){
         Entity entity = event.getEntity();
         if (entity.getCommandSenderWorld().isClientSide()) return;
         if (!(entity instanceof AbstractArrow)) return;
@@ -29,9 +29,9 @@ public class ProjectileHandler {
             int punchLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH_ARROWS, (LivingEntity) shooter);
             arrow.setKnockback(punchLevel);
         } else {
-            int pircingLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.PIERCING, (LivingEntity) shooter);
-            if (pircingLevel > 0) {
-                arrow.setPierceLevel((byte)pircingLevel);
+            int piercingLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.PIERCING, (LivingEntity) shooter);
+            if (piercingLevel > 0) {
+                arrow.setPierceLevel((byte)piercingLevel);
             }
         }
     }

@@ -13,7 +13,3 @@ A Minecraft mod for forge 1.19 that allows some enchantments to effect extra ite
     - flame / piercing / multishot
     - fire aspect / fortune / silk touch
     - quick charge / power / impaling 
-
-## Mixins
-
-should really use them
