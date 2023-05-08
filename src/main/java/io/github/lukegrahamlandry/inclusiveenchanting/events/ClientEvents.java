@@ -1,15 +1,12 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.events;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import io.github.lukegrahamlandry.inclusiveenchanting.CustomEnchantTableRenderer;
 import io.github.lukegrahamlandry.inclusiveenchanting.CustomTridentItem;
 import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
-import io.github.lukegrahamlandry.inclusiveenchanting.init.*;
-import net.minecraft.block.Blocks;
+import io.github.lukegrahamlandry.inclusiveenchanting.init.EntityInit;
+import io.github.lukegrahamlandry.inclusiveenchanting.init.ItemInit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.EnchantmentScreen;
 import net.minecraft.client.renderer.entity.TridentRenderer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
@@ -26,7 +23,6 @@ import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -36,16 +32,6 @@ import java.util.Random;
 public class ClientEvents {
     @Mod.EventBusSubscriber(modid = InclusiveEnchanting.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
     public static class ForgeEvent{
-        static Random rand = new Random();
-
-        @SubscribeEvent
-        public static void replaceEnchantTable(BlockEvent.EntityPlaceEvent event){
-            if (!event.getEntity().getEntityWorld().isRemote() && event.getPlacedBlock().getBlock() == Blocks.ENCHANTING_TABLE){
-                event.getBlockSnapshot().getWorld().setBlockState(event.getBlockSnapshot().getPos(), BlockInit.CUSTOM_ENCHANT_TABLE.get().getDefaultState(), 2);
-                // event.setCanceled(true);
-            }
-        }
-
         @SubscribeEvent
         public static void replaceTrident(TickEvent.PlayerTickEvent event){
             if (!event.player.getEntityWorld().isRemote() && event.player.getHeldItem(Hand.MAIN_HAND).getItem() == Items.TRIDENT){
@@ -104,9 +90,6 @@ public class ClientEvents {
             RenderingRegistry.registerEntityRenderingHandler(EntityInit.CUSTOM_TRIDENT.get(), TridentRenderer::new);
 
             Minecraft.getInstance().getItemRenderer().getItemModelMesher().register(ItemInit.CUSTOM_TRIDENT.get(), new ModelResourceLocation("minecraft:trident_in_hand#inventory"));
-
-            ClientRegistry.bindTileEntityRenderer(TileEntityInit.ENCHANTING_TABLE.get(), CustomEnchantTableRenderer::new);
-            ScreenManager.registerFactory(ContainerInit.ENCHANT_TABLE.get(), EnchantmentScreen::new);
 
             ItemModelsProperties.registerProperty(ItemInit.CUSTOM_TRIDENT.get(), new ResourceLocation("throwing"), (p_239419_0_, p_239419_1_, p_239419_2_) -> {
                 return p_239419_2_ != null && p_239419_2_.isHandActive() && p_239419_2_.getActiveItemStack() == p_239419_0_ ? 1.0F : 0.0F;

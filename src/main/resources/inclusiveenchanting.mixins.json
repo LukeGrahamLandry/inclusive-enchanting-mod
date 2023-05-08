@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.lukegrahamlandry.inclusiveenchanting.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "inclusiveenchanting.refmap.json",
+  "mixins": [
+    "EnchantmentMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
