@@ -2,20 +2,23 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        maven { url = 'https://maven.parchmentmc.org' }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.parchmentmc:librarian:1.+'
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0.17'
+version = '1.2.19'
 group = 'io.github.lukegrahamlandry.inclusiveenchanting' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'inclusiveenchanting'
 
@@ -28,9 +31,9 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20201028-1.16.3'
+    mappings channel: 'parchment', version: '2022.03.06-1.16.5'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    
+
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
@@ -74,14 +77,15 @@ minecraft {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
-
+    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
     manifest {
         attributes([
-            "Implementation-Version": "${version}"
+            "Implementation-Version": "${version}",
+            "MixinConfigs": "inclusiveenchanting.mixins.json"
         ])
     }
 }

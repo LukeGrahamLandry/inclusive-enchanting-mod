@@ -24,11 +24,11 @@ public class RegistryInit {
 
     static final DeferredRegister<TileEntityType<?>> TILE_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, InclusiveEnchanting.MOD_ID);
     static final RegistryObject<TileEntityType<CustomEnchantTable.Tile>> ENCHANTING_TABLE
-            = TILE_ENTITY_TYPES.register("custom_enchanting_table", () -> TileEntityType.Builder.create(CustomEnchantTable.Tile::new, CUSTOM_ENCHANT_TABLE.get()).build(null));
+            = TILE_ENTITY_TYPES.register("custom_enchanting_table", () -> TileEntityType.Builder.of(CustomEnchantTable.Tile::new, CUSTOM_ENCHANT_TABLE.get()).build(null));
 
     static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, InclusiveEnchanting.MOD_ID);
     static final RegistryObject<Item> CUSTOM_TRIDENT = ITEMS.register("custom_trident",
-            () -> new CustomTridentItem((new Item.Properties()).maxDamage(250)));
+            () -> new CustomTridentItem((new Item.Properties()).defaultDurability(250)));
 
     // No need to keep CustomTridentEntity because I was using the wrong constructor before so even if it was in entity form when someone
     // saved the world, the entity type would be stored as a vanilla trident.

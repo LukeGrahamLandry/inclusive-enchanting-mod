@@ -8,10 +8,11 @@ import net.minecraft.world.IBlockReader;
 @Deprecated
 class CustomEnchantTable extends EnchantingTableBlock {
     CustomEnchantTable() {
-        super(AbstractBlock.Properties.from(Blocks.ENCHANTING_TABLE));
+        super(AbstractBlock.Properties.copy(Blocks.ENCHANTING_TABLE));
     }
 
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+    @Override
+    public TileEntity newBlockEntity(IBlockReader level) {
         return new Tile();
     }
 
@@ -21,9 +22,10 @@ class CustomEnchantTable extends EnchantingTableBlock {
             super(RegistryInit.ENCHANTING_TABLE.get());
         }
 
+        @Override
         public void tick() {
-            if (this.hasWorld() && !this.getWorld().isRemote()){
-                this.getWorld().setBlockState(this.getPos(), Blocks.ENCHANTING_TABLE.getDefaultState());
+            if (this.hasLevel() && !this.getLevel().isClientSide()){
+                this.getLevel().setBlockAndUpdate(this.getBlockPos(), Blocks.ENCHANTING_TABLE.defaultBlockState());
             }
         }
     }

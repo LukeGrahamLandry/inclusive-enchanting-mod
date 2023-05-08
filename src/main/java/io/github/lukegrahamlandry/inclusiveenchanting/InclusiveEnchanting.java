@@ -29,17 +29,17 @@ public class InclusiveEnchanting {
     private static final List<Set<Enchantment>> incompatibleEnchants = new ArrayList<>();
 
     public InclusiveEnchanting() {
-        validEnchants.put(Enchantments.FLAME, (item) -> item.getItem().isCrossbow(item));
-        validEnchants.put(Enchantments.PUNCH, (item) -> item.getItem().isCrossbow(item));
+        validEnchants.put(Enchantments.FLAMING_ARROWS, (item) -> item.getItem() instanceof CrossbowItem);
+        validEnchants.put(Enchantments.PUNCH_ARROWS, (item) -> item.getItem() instanceof CrossbowItem);
         validEnchants.put(Enchantments.PIERCING, (item) -> item.getItem() instanceof BowItem || item.getItem() instanceof TridentItem);
         validEnchants.put(Enchantments.FIRE_ASPECT, (item) -> item.getItem() instanceof ToolItem);
         validEnchants.put(Enchantments.QUICK_CHARGE, (item) -> item.getItem() instanceof BowItem);
         validEnchants.put(Enchantments.KNOCKBACK, (item) -> item.getItem() instanceof ShieldItem);
-        validEnchants.put(Enchantments.POWER, (item) -> item.getItem() instanceof TridentItem);
+        validEnchants.put(Enchantments.POWER_ARROWS, (item) -> item.getItem() instanceof TridentItem);
 
-        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAME, Enchantments.MULTISHOT, Enchantments.PIERCING));
-        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.FORTUNE));
-        incompatibleEnchants.add(Sets.newHashSet(Enchantments.QUICK_CHARGE, Enchantments.POWER, Enchantments.IMPALING));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FLAMING_ARROWS, Enchantments.MULTISHOT, Enchantments.PIERCING));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.FIRE_ASPECT, Enchantments.SILK_TOUCH, Enchantments.BLOCK_FORTUNE));
+        incompatibleEnchants.add(Sets.newHashSet(Enchantments.QUICK_CHARGE, Enchantments.POWER_ARROWS, Enchantments.IMPALING));
         incompatibleEnchants.add(Sets.newHashSet(Enchantments.CHANNELING, Enchantments.RIPTIDE, Enchantments.PIERCING));
 
         RegistryInit.init();

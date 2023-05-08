@@ -14,22 +14,22 @@ public class ProjectileHandler {
     @SubscribeEvent
     public static void handleArrowShot(EntityJoinWorldEvent event){
         Entity entity = event.getEntity();
-        if (entity.getEntityWorld().isRemote()) return;
+        if (entity.level.isClientSide()) return;
         if (!(entity instanceof AbstractArrowEntity)) return;
         AbstractArrowEntity arrow = (AbstractArrowEntity) entity;
-        Entity shooter = arrow.func_234616_v_();  // change this to getShooter when mappings update
+        Entity shooter = arrow.getOwner();
         if (!(shooter instanceof LivingEntity)) return;
 
-        if (arrow.getShotFromCrossbow()){
-            boolean hasFlame = EnchantmentHelper.getMaxEnchantmentLevel(Enchantments.FLAME, (LivingEntity) shooter) > 0;
+        if (arrow.shotFromCrossbow()){
+            boolean hasFlame = EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAMING_ARROWS, ((LivingEntity) shooter)) > 0;
             if (hasFlame){
-                arrow.setFire(100);
+                arrow.setRemainingFireTicks(100);
             }
 
-            int punchLevel = EnchantmentHelper.getMaxEnchantmentLevel(Enchantments.PUNCH, (LivingEntity) shooter);
-            arrow.setKnockbackStrength(punchLevel);
+            int punchLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH_ARROWS, (LivingEntity) shooter);
+            arrow.setKnockback(punchLevel);
         } else {
-            int piercingLevel = EnchantmentHelper.getMaxEnchantmentLevel(Enchantments.PIERCING, (LivingEntity) shooter);
+            int piercingLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.PIERCING, (LivingEntity) shooter);
             if (piercingLevel > 0) {
                 arrow.setPierceLevel((byte)piercingLevel);
             }

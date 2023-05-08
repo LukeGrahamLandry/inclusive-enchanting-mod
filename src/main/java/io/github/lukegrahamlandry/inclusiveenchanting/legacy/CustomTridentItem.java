@@ -19,7 +19,7 @@ class CustomTridentItem extends TridentItem {
         if (player instanceof PlayerEntity) {
             ItemStack trident = new ItemStack(Items.TRIDENT);
             trident.setTag(stack.getOrCreateTag());
-            ((PlayerEntity) player).inventory.setInventorySlotContents(slot, trident);
+            ((PlayerEntity) player).inventory.setItem(slot, trident);
         }
     }
 }

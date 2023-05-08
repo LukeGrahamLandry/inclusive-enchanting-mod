@@ -27,15 +27,15 @@ public class SmeltingLootModifier extends LootModifier {
     public List<ItemStack> doApply(List<ItemStack> originalLoot, LootContext context) {
         List<ItemStack> newLoot = new ArrayList<>();
         for(ItemStack stack : originalLoot) {
-            newLoot.add(smelt(stack, context.getWorld()));
+            newLoot.add(smelt(stack, context.getLevel()));
         }
 
         return newLoot;
     }
 
     private static ItemStack smelt(ItemStack stack, World world) {
-        return world.getRecipeManager().getRecipe(IRecipeType.SMELTING, new Inventory(stack), world)
-                .map(FurnaceRecipe::getRecipeOutput)
+        return world.getRecipeManager().getRecipeFor(IRecipeType.SMELTING, new Inventory(stack), world)
+                .map(FurnaceRecipe::getResultItem)
                 .filter(itemStack -> !itemStack.isEmpty())
                 .map(itemStack -> ItemHandlerHelper.copyStackWithSize(itemStack, stack.getCount() * itemStack.getCount()))
                 .orElse(stack);
