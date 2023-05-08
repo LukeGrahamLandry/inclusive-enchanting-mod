@@ -1,8 +1,6 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.events;
 
 
-import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;

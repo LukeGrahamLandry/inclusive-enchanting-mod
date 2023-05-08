@@ -1,6 +1,6 @@
 package io.github.lukegrahamlandry.inclusiveenchanting.mixin;
 
-import io.github.lukegrahamlandry.inclusiveenchanting.events.AnvilEnchantHandler;
+import io.github.lukegrahamlandry.inclusiveenchanting.InclusiveEnchanting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +17,7 @@ public class EnchantmentMixin {
     @Inject(at = @At("HEAD"), method = "canApplyAtEnchantingTable", cancellable = true, remap = false)
     private void canApplyAtEnchantingTable(ItemStack stack, CallbackInfoReturnable<Boolean> cir){
         Enchantment self = (Enchantment) (Object) this;
-        if (AnvilEnchantHandler.isNewValid(self, stack)) {
+        if (InclusiveEnchanting.isNewValid(self, stack)) {
             cir.setReturnValue(true);
         }
     }
@@ -27,7 +27,7 @@ public class EnchantmentMixin {
     @Inject(at = @At("HEAD"), method = "isCompatibleWith", cancellable = true)
     private void isCompatibleWith(Enchantment other, CallbackInfoReturnable<Boolean> cir){
         Enchantment self = (Enchantment) (Object) this;
-        if (AnvilEnchantHandler.areNewIncompateble(self, other)) {
+        if (InclusiveEnchanting.areNewIncompatible(self, other)) {
             cir.setReturnValue(false);
         }
     }

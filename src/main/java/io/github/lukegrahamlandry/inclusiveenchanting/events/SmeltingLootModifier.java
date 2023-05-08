@@ -28,6 +28,7 @@ public class SmeltingLootModifier extends LootModifier {
     public List<ItemStack> doApply(List<ItemStack> originalLoot, LootContext context) {
         List<ItemStack> newLoot = new ArrayList<>();
         for(ItemStack stack : originalLoot) {
+            InclusiveEnchanting.LOGGER.debug("autosmelt {}", stack);
             newLoot.add(smelt(stack, context.getWorld()));
         }
 

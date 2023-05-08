@@ -34,6 +34,7 @@ public class CustomTridentItem extends TridentItem {
         super(properties.setISTER(() -> ISTER::new));
     }
 
+    // only change is CustomTridentEntity and getDrawTime instead of 10
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
         if (entityLiving instanceof PlayerEntity) {
             PlayerEntity playerentity = (PlayerEntity)entityLiving;
